@@ -7,7 +7,6 @@ services:
       - "3000:3000"
     volumes:
       - burger_party_data:/app/data
-      - ./server/config.json:/app/config.json:ro
     restart: unless-stopped
 
 volumes:

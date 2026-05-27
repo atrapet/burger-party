@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
 import type { CreateOrderPayload, Order } from '@/types';
 import { useMenu } from '@/hooks/useMenu';
@@ -8,6 +8,13 @@ import { ConnectionBanner } from '@/ui/ConnectionBanner';
 import { BurgerBuilder } from '@/components/BurgerBuilder/BurgerBuilder';
 import { OrderStatusView } from '@/components/OrderStatusView/OrderStatusView';
 
+const STORAGE_KEY = 'burger-party-order-id';
+
+const fetchOrder = (id: string): Promise<Order | null> =>
+  fetch(`/api/orders/${id}`)
+    .then((res) => (res.ok ? (res.json() as Promise<Order>) : null))
+    .catch(() => null);
+
 export const OrderPage: FC = () => {
   const { menu, error: menuError } = useMenu();
   const disabledStock = useStock();
@@ -15,13 +22,34 @@ export const OrderPage: FC = () => {
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Restore a previous order from localStorage on first load.
+  useEffect(() => {
+    const savedId = localStorage.getItem(STORAGE_KEY);
+    if (!savedId) return;
+    fetchOrder(savedId).then((recovered) => {
+      if (recovered && recovered.status !== 'served' && recovered.status !== 'cancelled') {
+        setOrder(recovered);
+      } else {
+        localStorage.removeItem(STORAGE_KEY);
+      }
+    });
+  }, []);
+
   const handleSubmit = (payload: CreateOrderPayload) => {
     setSubmitting(true);
     setError(null);
     submitOrder(payload)
-      .then(setOrder)
+      .then((submitted) => {
+        localStorage.setItem(STORAGE_KEY, submitted.id);
+        setOrder(submitted);
+      })
       .catch((submitError: Error) => setError(submitError.message))
       .finally(() => setSubmitting(false));
+  };
+
+  const handleReset = () => {
+    localStorage.removeItem(STORAGE_KEY);
+    setOrder(null);
   };
 
   if (menuError) {
@@ -42,7 +70,7 @@ export const OrderPage: FC = () => {
         </header>
 
         {order ? (
-          <OrderStatusView order={order} onReset={() => setOrder(null)} />
+          <OrderStatusView order={order} onReset={handleReset} />
         ) : (
           <BurgerBuilder
             menu={menu}

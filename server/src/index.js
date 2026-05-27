@@ -5,7 +5,7 @@ import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
 import { config } from './config.js';
-import { listOrders } from './db.js';
+import { listOrders, getOrder } from './db.js';
 import { createOrder, advanceOrder, setOrderStatus } from './orders.js';
 
 const here = dirname(fileURLToPath(import.meta.url));
@@ -18,6 +18,11 @@ app.use(express.json());
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
 app.get('/api/config', (_req, res) => res.json(config));
 app.get('/api/orders', (_req, res) => res.json(listOrders(true)));
+app.get('/api/orders/:id', (req, res) => {
+  const order = getOrder(req.params.id);
+  if (!order) return res.status(404).json({ error: 'Commande introuvable' });
+  res.json(order);
+});
 
 // Serve the built React app (and SPA-fallback so /kitchen survives a refresh).
 if (existsSync(webDir)) {

@@ -6,6 +6,8 @@ WORKDIR /web
 COPY web/package.json web/package-lock.json ./
 RUN npm ci
 COPY web/ ./
+ARG VITE_BASE_PATH=/
+ENV VITE_BASE_PATH=$VITE_BASE_PATH
 RUN npm run build
 
 # --- Stage 2: runtime — Node server serves the built client + realtime API ---

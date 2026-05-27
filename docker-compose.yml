@@ -1,6 +1,9 @@
 services:
   burger-party:
-    build: .
+    build:
+      context: .
+      args:
+        VITE_BASE_PATH: /burger/
     container_name: burger-party
     ports:
       # host:container — change the host port if 3000 is taken on your Ubuntu box

@@ -3,7 +3,7 @@ import type { CreateOrderPayload, Order, OrderAck, OrderStatus } from '@/types';
 
 // Same-origin connection; socket.io-client falls back to HTTP long-polling when a
 // reverse proxy blocks the WebSocket upgrade, and auto-reconnects on flaky cellular.
-export const socket = io({ autoConnect: true });
+export const socket = io({ autoConnect: true, path: `${import.meta.env.BASE_URL}socket.io` });
 
 const emitOrder = (event: string, payload: unknown): Promise<Order> =>
   new Promise((resolve, reject) => {

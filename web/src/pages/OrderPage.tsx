@@ -14,7 +14,7 @@ const LAST_ORDER_KEY = 'burger-party-last-order';
 type SavedOrder = { name: string; selections: SelectionMap; quantities: QuantityMap };
 
 const fetchOrder = (id: string): Promise<Order | null> =>
-  fetch(`/api/orders/${id}`)
+  fetch(`${import.meta.env.BASE_URL}api/orders/${id}`)
     .then((res) => (res.ok ? (res.json() as Promise<Order>) : null))
     .catch(() => null);
 

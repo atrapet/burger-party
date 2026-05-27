@@ -1,0 +1,16 @@
+{
+  "name": "burger-party-server",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "Realtime burger-ordering server (Express + Socket.io + node:sqlite)",
+  "main": "src/index.js",
+  "scripts": {
+    "start": "node --disable-warning=ExperimentalWarning src/index.js",
+    "dev": "node --disable-warning=ExperimentalWarning --watch src/index.js"
+  },
+  "dependencies": {
+    "express": "^4.21.2",
+    "socket.io": "^4.8.1"
+  }
+}

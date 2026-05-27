@@ -1,0 +1,13 @@
+services:
+  burger-party:
+    build: .
+    container_name: burger-party
+    ports:
+      # host:container — change the host port if 3000 is taken on your Ubuntu box
+      - "3000:3000"
+    volumes:
+      # Orders DB persists here across restarts/rebuilds
+      - ./data:/app/data
+      # Edit the menu/friends list on the host, then `docker compose restart`
+      - ./server/config.json:/app/config.json:ro
+    restart: unless-stopped

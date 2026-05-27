@@ -1,0 +1,101 @@
+{
+  "eventName": "Burger Party 🍔",
+  "subtitle": "Compose ton burger, la cuisine s'occupe du reste !",
+  "friends": [
+    "Alex",
+    "Camille",
+    "Sam",
+    "Julie",
+    "Thomas",
+    "Léa",
+    "Maxime",
+    "Chloé"
+  ],
+  "categories": [
+    {
+      "id": "bun",
+      "label": "Pain",
+      "emoji": "🍞",
+      "selection": "single",
+      "required": true,
+      "options": [
+        { "id": "brioche", "label": "Pain brioché" },
+        { "id": "sesame", "label": "Pain sésame" },
+        { "id": "complet", "label": "Pain complet" },
+        { "id": "sans-pain", "label": "Sans pain (en salade)" }
+      ]
+    },
+    {
+      "id": "patty",
+      "label": "Garniture principale",
+      "emoji": "🥩",
+      "selection": "single",
+      "required": true,
+      "options": [
+        { "id": "boeuf", "label": "Steak de bœuf" },
+        { "id": "poulet", "label": "Poulet pané" },
+        { "id": "veggie", "label": "Galette veggie" },
+        { "id": "double-boeuf", "label": "Double steak de bœuf" }
+      ]
+    },
+    {
+      "id": "cheese",
+      "label": "Fromage",
+      "emoji": "🧀",
+      "selection": "single",
+      "required": false,
+      "options": [
+        { "id": "cheddar", "label": "Cheddar" },
+        { "id": "chevre", "label": "Chèvre" },
+        { "id": "bleu", "label": "Bleu" },
+        { "id": "raclette", "label": "Raclette" }
+      ]
+    },
+    {
+      "id": "toppings",
+      "label": "Garnitures",
+      "emoji": "🥬",
+      "selection": "multi",
+      "required": false,
+      "options": [
+        { "id": "salade", "label": "Salade" },
+        { "id": "tomate", "label": "Tomate" },
+        { "id": "oignon", "label": "Oignon" },
+        { "id": "oignon-frit", "label": "Oignons frits" },
+        { "id": "cornichon", "label": "Cornichons" },
+        { "id": "bacon", "label": "Bacon" },
+        { "id": "oeuf", "label": "Œuf" },
+        { "id": "champignon", "label": "Champignons" }
+      ]
+    },
+    {
+      "id": "sauces",
+      "label": "Sauces",
+      "emoji": "🧂",
+      "selection": "multi",
+      "required": false,
+      "max": 3,
+      "options": [
+        { "id": "ketchup", "label": "Ketchup" },
+        { "id": "mayo", "label": "Mayonnaise" },
+        { "id": "bbq", "label": "Barbecue" },
+        { "id": "burger", "label": "Sauce burger" },
+        { "id": "moutarde", "label": "Moutarde" },
+        { "id": "samourai", "label": "Samouraï" }
+      ]
+    },
+    {
+      "id": "sides",
+      "label": "Accompagnement",
+      "emoji": "🍟",
+      "selection": "single",
+      "required": false,
+      "options": [
+        { "id": "frites", "label": "Frites" },
+        { "id": "potatoes", "label": "Potatoes" },
+        { "id": "salade-verte", "label": "Salade verte" },
+        { "id": "rien", "label": "Rien, merci" }
+      ]
+    }
+  ]
+}

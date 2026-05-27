@@ -1,0 +1,6 @@
+# Reverse-proxy snippet for Caddy. Caddy handles HTTPS certs AND WebSocket
+# upgrades automatically, so a single line is enough.
+
+burger.example.com {
+    reverse_proxy 127.0.0.1:3000
+}

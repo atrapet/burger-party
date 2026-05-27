@@ -25,53 +25,52 @@
       "selection": "single",
       "required": true,
       "options": [
-        { "id": "brioche", "label": "Pain brioché" },
-        { "id": "sesame", "label": "Pain sésame" },
-        { "id": "complet", "label": "Pain complet" },
-        { "id": "sans-pain", "label": "Sans pain (en salade)" }
+        { "id": "sesame", "label": "Sésame" },
+        { "id": "pavot", "label": "Pavot" },
+        { "id": "nature", "label": "Nature" }
       ]
     },
     {
       "id": "patty",
-      "label": "Garniture principale",
+      "label": "Steak",
       "emoji": "🥩",
       "selection": "single",
       "required": true,
+      "quantifiable": true,
       "options": [
-        { "id": "boeuf", "label": "Steak de bœuf" },
-        { "id": "poulet", "label": "Poulet pané" },
-        { "id": "veggie", "label": "Galette veggie" },
-        { "id": "double-boeuf", "label": "Double steak de bœuf" }
+        { "id": "boeuf", "label": "Steak bœuf" }
       ]
     },
     {
       "id": "cheese",
       "label": "Fromage",
       "emoji": "🧀",
-      "selection": "single",
+      "selection": "multi",
       "required": false,
+      "quantifiable": true,
       "options": [
-        { "id": "cheddar", "label": "Cheddar" },
+        { "id": "raclette", "label": "Raclette" },
+        { "id": "st-nectaire", "label": "St Nectaire" },
+        { "id": "comte", "label": "Comté" },
+        { "id": "toastinette", "label": "Toastinette" },
         { "id": "chevre", "label": "Chèvre" },
-        { "id": "bleu", "label": "Bleu" },
-        { "id": "raclette", "label": "Raclette" }
+        { "id": "mozzarella", "label": "Mozzarella" }
       ]
     },
     {
-      "id": "toppings",
-      "label": "Garnitures",
+      "id": "legumes",
+      "label": "Légumes",
       "emoji": "🥬",
       "selection": "multi",
       "required": false,
+      "quantifiable": true,
       "options": [
         { "id": "salade", "label": "Salade" },
         { "id": "tomate", "label": "Tomate" },
-        { "id": "oignon", "label": "Oignon" },
-        { "id": "oignon-frit", "label": "Oignons frits" },
-        { "id": "cornichon", "label": "Cornichons" },
-        { "id": "bacon", "label": "Bacon" },
-        { "id": "oeuf", "label": "Œuf" },
-        { "id": "champignon", "label": "Champignons" }
+        { "id": "cornichons", "label": "Cornichons" },
+        { "id": "oignons-rouges", "label": "Oignons rouges" },
+        { "id": "oignons-frits", "label": "Oignons frits" },
+        { "id": "confit-oignons", "label": "Confit d'oignons" }
       ]
     },
     {
@@ -80,14 +79,27 @@
       "emoji": "🧂",
       "selection": "multi",
       "required": false,
-      "max": 3,
       "options": [
-        { "id": "ketchup", "label": "Ketchup" },
-        { "id": "mayo", "label": "Mayonnaise" },
         { "id": "bbq", "label": "Barbecue" },
-        { "id": "burger", "label": "Sauce burger" },
+        { "id": "mayo", "label": "Mayonnaise" },
+        { "id": "ketchup", "label": "Ketchup" },
         { "id": "moutarde", "label": "Moutarde" },
-        { "id": "samourai", "label": "Samouraï" }
+        { "id": "burger", "label": "Burger" },
+        { "id": "pita", "label": "Pita" },
+        { "id": "poivre", "label": "Poivre" }
+      ]
+    },
+    {
+      "id": "extras",
+      "label": "Extras",
+      "emoji": "✨",
+      "selection": "multi",
+      "required": false,
+      "quantifiable": true,
+      "options": [
+        { "id": "bacon", "label": "Bacon" },
+        { "id": "oeuf", "label": "Œuf" },
+        { "id": "roesti", "label": "Rösti" }
       ]
     },
     {
@@ -98,9 +110,7 @@
       "required": false,
       "options": [
         { "id": "frites", "label": "Frites" },
-        { "id": "potatoes", "label": "Potatoes" },
-        { "id": "salade-verte", "label": "Salade verte" },
-        { "id": "rien", "label": "Rien, merci" }
+        { "id": "frites-patate-douce", "label": "Frites de patate douce" }
       ]
     }
   ]

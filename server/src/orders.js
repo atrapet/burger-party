@@ -7,9 +7,13 @@ export const STATUS_FLOW = ['new', 'cooking', 'ready', 'served'];
 
 const asArray = (value) => (Array.isArray(value) ? value : [value]);
 
-const resolveSelection = (category, raw) => {
+const resolveSelection = (category, raw, qtys = {}) => {
   const ids = asArray(raw).filter(Boolean);
-  const labels = ids.map((id) => optionLabel(category.id, id)).filter(Boolean);
+  const labels = ids.map((id) => {
+    const base = optionLabel(category.id, id);
+    if (!base) return null;
+    return qtys[id] === 2 ? `${base} ×2` : base;
+  }).filter(Boolean);
   return { categoryId: category.id, label: category.label, emoji: category.emoji ?? '', options: labels };
 };
 
@@ -32,22 +36,22 @@ const validateCategory = (category, raw) => {
 
 // Validates the raw selections against config and returns either an error or the
 // display-ready items (labels resolved now so the kitchen ticket survives config edits).
-const buildItems = (selections) => {
+const buildItems = (selections, quantities = {}) => {
   const items = [];
   for (const category of config.categories) {
     const error = validateCategory(category, selections[category.id]);
     if (error) return { error };
-    const resolved = resolveSelection(category, selections[category.id]);
+    const resolved = resolveSelection(category, selections[category.id], quantities[category.id] ?? {});
     if (resolved.options.length !== 0) items.push(resolved);
   }
   return { items };
 };
 
-export const createOrder = ({ name, selections, note }) => {
+export const createOrder = ({ name, selections, note, quantities }) => {
   const trimmedName = typeof name === 'string' ? name.trim() : '';
   if (trimmedName.length === 0) return { error: 'Indique ton prénom' };
 
-  const { error, items } = buildItems(selections ?? {});
+  const { error, items } = buildItems(selections ?? {}, quantities ?? {});
   if (error) return { error };
 
   const now = Date.now();

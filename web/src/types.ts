@@ -14,6 +14,7 @@ export type CategoryType = {
   selection: SelectionMode;
   required?: boolean;
   max?: number;
+  quantifiable?: boolean;
   options: OptionType[];
 };
 
@@ -27,9 +28,13 @@ export type MenuConfig = {
 // Raw selections collected in the order form: one option id (single) or many (multi).
 export type SelectionMap = Record<string, string | string[]>;
 
+// Per-category, per-option quantity (1 or 2). Only present for quantifiable categories.
+export type QuantityMap = Record<string, Record<string, 1 | 2>>;
+
 export type CreateOrderPayload = {
   name: string;
   selections: SelectionMap;
+  quantities?: QuantityMap;
   note?: string;
 };
 

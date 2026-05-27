@@ -28,6 +28,9 @@ if (existsSync(webDir)) {
 const server = createServer(app);
 const io = new Server(server, { cors: { origin: true } });
 
+// In-memory set of option IDs marked out-of-stock by the kitchen. Resets on server restart.
+const disabledOptions = new Set();
+
 // Broadcast a successful mutation to everyone (kitchen board + ordering phones),
 // or send the validation error back to just the caller via the ack callback.
 const broadcast = (event, result, ack) => {
@@ -41,12 +44,23 @@ const broadcast = (event, result, ack) => {
 
 io.on('connection', (socket) => {
   socket.emit('orders:sync', listOrders(true));
+  socket.emit('stock:sync', [...disabledOptions]);
 
   socket.on('order:create', (payload, ack) => broadcast('order:new', createOrder(payload ?? {}), ack));
   socket.on('order:advance', ({ id } = {}, ack) => broadcast('order:update', advanceOrder(id), ack));
   socket.on('order:status', ({ id, status } = {}, ack) =>
     broadcast('order:update', setOrderStatus(id, status), ack),
   );
+
+  socket.on('stock:toggle', ({ optionId } = {}) => {
+    if (typeof optionId !== 'string') return;
+    if (disabledOptions.has(optionId)) {
+      disabledOptions.delete(optionId);
+    } else {
+      disabledOptions.add(optionId);
+    }
+    io.emit('stock:sync', [...disabledOptions]);
+  });
 });
 
 server.listen(port, () => console.log(`🍔 Burger party server on :${port}`));

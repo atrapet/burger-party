@@ -1,6 +1,6 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import type { FC } from 'react';
-import type { CreateOrderPayload, MenuConfig, SelectionMap } from '@/types';
+import type { CreateOrderPayload, MenuConfig, QuantityMap, SelectionMap } from '@/types';
 import { NamePicker } from '@/components/NamePicker/NamePicker';
 import { CategoryPicker } from '@/components/CategoryPicker/CategoryPicker';
 import { Button } from '@/ui/Button';
@@ -10,20 +10,44 @@ type Props = {
   menu: MenuConfig;
   submitting: boolean;
   error: string | null;
+  disabledStock: Set<string>;
   onSubmit: (payload: CreateOrderPayload) => void;
 };
 
 // Self-contained ordering form: name, per-category choices, an optional note, submit.
-export const BurgerBuilder: FC<Props> = ({ menu, submitting, error, onSubmit }) => {
+export const BurgerBuilder: FC<Props> = ({ menu, submitting, error, disabledStock, onSubmit }) => {
   const [name, setName] = useState('');
   const [selections, setSelections] = useState<SelectionMap>({});
+  const [quantities, setQuantities] = useState<QuantityMap>({});
   const [note, setNote] = useState('');
+
+  // Auto-deselect options that go out of stock while the form is open.
+  useEffect(() => {
+    if (disabledStock.size === 0) return;
+    setSelections((prev) => {
+      const next = { ...prev };
+      for (const [catId, val] of Object.entries(next)) {
+        if (Array.isArray(val)) {
+          next[catId] = val.filter((id) => !disabledStock.has(id));
+        } else if (typeof val === 'string' && disabledStock.has(val)) {
+          next[catId] = '';
+        }
+      }
+      return next;
+    });
+  }, [disabledStock]);
 
   const missing = missingRequired(menu.categories, selections);
   const canSubmit = name.trim().length !== 0 && missing.length === 0 && !submitting;
 
   const updateSelection = (categoryId: string, next: string | string[] | undefined) =>
     setSelections((prev) => ({ ...prev, [categoryId]: next ?? '' }));
+
+  const updateQuantity = (categoryId: string, optionId: string, qty: 1 | 2) =>
+    setQuantities((prev) => ({
+      ...prev,
+      [categoryId]: { ...(prev[categoryId] ?? {}), [optionId]: qty },
+    }));
 
   return (
     <div className="flex flex-col gap-6 pb-28">
@@ -37,7 +61,10 @@ export const BurgerBuilder: FC<Props> = ({ menu, submitting, error, onSubmit }) 
           key={category.id}
           category={category}
           value={selections[category.id]}
+          quantities={quantities[category.id]}
+          disabledStock={disabledStock}
           onChange={(next) => updateSelection(category.id, next)}
+          onQuantityChange={(optionId, qty) => updateQuantity(category.id, optionId, qty)}
         />
       ))}
 
@@ -61,7 +88,7 @@ export const BurgerBuilder: FC<Props> = ({ menu, submitting, error, onSubmit }) 
           <Button
             className="w-full"
             disabled={!canSubmit}
-            onClick={() => onSubmit({ name, selections, note })}
+            onClick={() => onSubmit({ name, selections, quantities, note })}
           >
             {submitting ? 'Envoi…' : 'Envoyer en cuisine 🍔'}
           </Button>

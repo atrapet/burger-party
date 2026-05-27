@@ -20,3 +20,7 @@ export const advanceOrder = (id: string) => emitOrder('order:advance', { id });
 
 export const setOrderStatus = (id: string, status: OrderStatus) =>
   emitOrder('order:status', { id, status });
+
+export const toggleStock = (optionId: string): void => {
+  socket.emit('stock:toggle', { optionId });
+};

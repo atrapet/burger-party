@@ -2,6 +2,7 @@ import { useState } from 'react';
 import type { FC } from 'react';
 import type { CreateOrderPayload, Order } from '@/types';
 import { useMenu } from '@/hooks/useMenu';
+import { useStock } from '@/hooks/useStock';
 import { submitOrder } from '@/lib/socket';
 import { ConnectionBanner } from '@/ui/ConnectionBanner';
 import { BurgerBuilder } from '@/components/BurgerBuilder/BurgerBuilder';
@@ -9,6 +10,7 @@ import { OrderStatusView } from '@/components/OrderStatusView/OrderStatusView';
 
 export const OrderPage: FC = () => {
   const { menu, error: menuError } = useMenu();
+  const disabledStock = useStock();
   const [order, setOrder] = useState<Order | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -42,7 +44,13 @@ export const OrderPage: FC = () => {
         {order ? (
           <OrderStatusView order={order} onReset={() => setOrder(null)} />
         ) : (
-          <BurgerBuilder menu={menu} submitting={submitting} error={error} onSubmit={handleSubmit} />
+          <BurgerBuilder
+            menu={menu}
+            submitting={submitting}
+            error={error}
+            disabledStock={disabledStock}
+            onSubmit={handleSubmit}
+          />
         )}
       </div>
     </div>

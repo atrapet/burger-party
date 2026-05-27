@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import type { FC } from 'react';
-import type { CreateOrderPayload, Order } from '@/types';
+import type { CreateOrderPayload, Order, QuantityMap, SelectionMap } from '@/types';
 import { useMenu } from '@/hooks/useMenu';
 import { useStock } from '@/hooks/useStock';
 import { submitOrder } from '@/lib/socket';
@@ -8,29 +8,42 @@ import { ConnectionBanner } from '@/ui/ConnectionBanner';
 import { BurgerBuilder } from '@/components/BurgerBuilder/BurgerBuilder';
 import { OrderStatusView } from '@/components/OrderStatusView/OrderStatusView';
 
-const STORAGE_KEY = 'burger-party-order-id';
+const ORDER_ID_KEY = 'burger-party-order-id';
+const LAST_ORDER_KEY = 'burger-party-last-order';
+
+type SavedOrder = { name: string; selections: SelectionMap; quantities: QuantityMap };
 
 const fetchOrder = (id: string): Promise<Order | null> =>
   fetch(`/api/orders/${id}`)
     .then((res) => (res.ok ? (res.json() as Promise<Order>) : null))
     .catch(() => null);
 
+const loadLastOrder = (): SavedOrder | null => {
+  try {
+    const raw = localStorage.getItem(LAST_ORDER_KEY);
+    return raw ? (JSON.parse(raw) as SavedOrder) : null;
+  } catch {
+    return null;
+  }
+};
+
 export const OrderPage: FC = () => {
   const { menu, error: menuError } = useMenu();
   const disabledStock = useStock();
   const [order, setOrder] = useState<Order | null>(null);
+  const [lastOrder, setLastOrder] = useState<SavedOrder | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Restore a previous order from localStorage on first load.
   useEffect(() => {
-    const savedId = localStorage.getItem(STORAGE_KEY);
+    setLastOrder(loadLastOrder());
+    const savedId = localStorage.getItem(ORDER_ID_KEY);
     if (!savedId) return;
     fetchOrder(savedId).then((recovered) => {
       if (recovered && recovered.status !== 'served' && recovered.status !== 'cancelled') {
         setOrder(recovered);
       } else {
-        localStorage.removeItem(STORAGE_KEY);
+        localStorage.removeItem(ORDER_ID_KEY);
       }
     });
   }, []);
@@ -40,7 +53,11 @@ export const OrderPage: FC = () => {
     setError(null);
     submitOrder(payload)
       .then((submitted) => {
-        localStorage.setItem(STORAGE_KEY, submitted.id);
+        localStorage.setItem(ORDER_ID_KEY, submitted.id);
+        localStorage.setItem(
+          LAST_ORDER_KEY,
+          JSON.stringify({ name: payload.name, selections: payload.selections, quantities: payload.quantities ?? {} }),
+        );
         setOrder(submitted);
       })
       .catch((submitError: Error) => setError(submitError.message))
@@ -48,7 +65,7 @@ export const OrderPage: FC = () => {
   };
 
   const handleReset = () => {
-    localStorage.removeItem(STORAGE_KEY);
+    localStorage.removeItem(ORDER_ID_KEY);
     setOrder(null);
   };
 
@@ -77,6 +94,9 @@ export const OrderPage: FC = () => {
             submitting={submitting}
             error={error}
             disabledStock={disabledStock}
+            initialName={lastOrder?.name}
+            initialSelections={lastOrder?.selections}
+            initialQuantities={lastOrder?.quantities}
             onSubmit={handleSubmit}
           />
         )}

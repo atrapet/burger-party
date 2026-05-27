@@ -11,14 +11,21 @@ type Props = {
   submitting: boolean;
   error: string | null;
   disabledStock: Set<string>;
+  initialName?: string;
+  initialSelections?: SelectionMap;
+  initialQuantities?: QuantityMap;
   onSubmit: (payload: CreateOrderPayload) => void;
 };
 
 // Self-contained ordering form: name, per-category choices, an optional note, submit.
-export const BurgerBuilder: FC<Props> = ({ menu, submitting, error, disabledStock, onSubmit }) => {
-  const [name, setName] = useState('');
-  const [selections, setSelections] = useState<SelectionMap>({});
-  const [quantities, setQuantities] = useState<QuantityMap>({});
+export const BurgerBuilder: FC<Props> = ({
+  menu, submitting, error, disabledStock,
+  initialName = '', initialSelections = {}, initialQuantities = {},
+  onSubmit,
+}) => {
+  const [name, setName] = useState(initialName);
+  const [selections, setSelections] = useState<SelectionMap>(initialSelections);
+  const [quantities, setQuantities] = useState<QuantityMap>(initialQuantities);
   const [note, setNote] = useState('');
 
   // Auto-deselect options that go out of stock while the form is open.

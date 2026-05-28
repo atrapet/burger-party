@@ -27,6 +27,7 @@ export const BurgerBuilder: FC<Props> = ({
   const [selections, setSelections] = useState<SelectionMap>(initialSelections);
   const [quantities, setQuantities] = useState<QuantityMap>(initialQuantities);
   const [note, setNote] = useState('');
+  const [splitForTwo, setSplitForTwo] = useState(false);
 
   // Auto-deselect options that go out of stock while the form is open.
   useEffect(() => {
@@ -75,6 +76,36 @@ export const BurgerBuilder: FC<Props> = ({
         />
       ))}
 
+      <section>
+        <button
+          type="button"
+          onClick={() => setSplitForTwo((v) => !v)}
+          className={`w-full rounded-2xl border-2 px-4 py-4 text-left transition-colors ${
+            splitForTwo
+              ? 'border-orange-400 bg-orange-50'
+              : 'border-stone-200 bg-white'
+          }`}
+        >
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-base font-bold text-stone-800">✂️ Burger pour deux</span>
+              <p className="mt-0.5 text-sm text-stone-500">Un burger servi coupé en 2 assiettes</p>
+            </div>
+            <div
+              className={`h-6 w-11 rounded-full transition-colors ${
+                splitForTwo ? 'bg-orange-500' : 'bg-stone-300'
+              }`}
+            >
+              <div
+                className={`mt-0.5 h-5 w-5 rounded-full bg-white shadow transition-transform ${
+                  splitForTwo ? 'translate-x-5.5' : 'translate-x-0.5'
+                }`}
+              />
+            </div>
+          </div>
+        </button>
+      </section>
+
       <section className="flex flex-col gap-2">
         <h2 className="text-lg font-bold text-stone-800">📝 Une précision ?</h2>
         <textarea
@@ -95,7 +126,7 @@ export const BurgerBuilder: FC<Props> = ({
           <Button
             className="w-full"
             disabled={!canSubmit}
-            onClick={() => onSubmit({ name, selections, quantities, note })}
+            onClick={() => onSubmit({ name, selections, quantities, note, splitForTwo })}
           >
             {submitting ? 'Envoi…' : 'Envoyer en cuisine 🍔'}
           </Button>

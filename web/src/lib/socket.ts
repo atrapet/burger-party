@@ -24,3 +24,7 @@ export const setOrderStatus = (id: string, status: OrderStatus) =>
 export const toggleStock = (optionId: string): void => {
   socket.emit('stock:toggle', { optionId });
 };
+
+export const setFriends = (list: string[]): void => {
+  socket.emit('friends:set', list);
+};

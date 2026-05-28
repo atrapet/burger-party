@@ -4,7 +4,7 @@ import { Server } from 'socket.io';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
 import { existsSync } from 'node:fs';
-import { config } from './config.js';
+import { config, friends, setFriends } from './config.js';
 import { listOrders, getOrder } from './db.js';
 import { createOrder, advanceOrder, setOrderStatus } from './orders.js';
 
@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.get('/api/health', (_req, res) => res.json({ ok: true }));
-app.get('/api/config', (_req, res) => res.json(config));
+app.get('/api/config', (_req, res) => res.json({ ...config, friends }));
 app.get('/api/orders', (_req, res) => res.json(listOrders(true)));
 app.get('/api/orders/:id', (req, res) => {
   const order = getOrder(req.params.id);
@@ -33,11 +33,15 @@ if (existsSync(webDir)) {
 const server = createServer(app);
 const io = new Server(server, { cors: { origin: true } });
 
+// The reverse proxy strips the path prefix but leaves a double leading slash (e.g. //api/config).
+// Normalize before socket.io and Express see the URL.
+const fixUrl = (req) => { req.url = req.url.replace(/^\/\/+/, '/'); };
+server.prependListener('request', fixUrl);
+server.prependListener('upgrade', fixUrl);
+
 // In-memory set of option IDs marked out-of-stock by the kitchen. Resets on server restart.
 const disabledOptions = new Set();
 
-// Broadcast a successful mutation to everyone (kitchen board + ordering phones),
-// or send the validation error back to just the caller via the ack callback.
 const broadcast = (event, result, ack) => {
   if (result.error) {
     ack?.({ error: result.error });
@@ -50,6 +54,7 @@ const broadcast = (event, result, ack) => {
 io.on('connection', (socket) => {
   socket.emit('orders:sync', listOrders(true));
   socket.emit('stock:sync', [...disabledOptions]);
+  socket.emit('friends:sync', friends);
 
   socket.on('order:create', (payload, ack) => broadcast('order:new', createOrder(payload ?? {}), ack));
   socket.on('order:advance', ({ id } = {}, ack) => broadcast('order:update', advanceOrder(id), ack));
@@ -65,6 +70,13 @@ io.on('connection', (socket) => {
       disabledOptions.add(optionId);
     }
     io.emit('stock:sync', [...disabledOptions]);
+  });
+
+  socket.on('friends:set', (list) => {
+    if (!Array.isArray(list)) return;
+    const cleaned = list.map((n) => (typeof n === 'string' ? n.trim() : '')).filter(Boolean).slice(0, 100);
+    setFriends(cleaned);
+    io.emit('friends:sync', friends);
   });
 });
 

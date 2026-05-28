@@ -36,6 +36,7 @@ export type CreateOrderPayload = {
   selections: SelectionMap;
   quantities?: QuantityMap;
   note?: string;
+  splitForTwo?: boolean;
 };
 
 // Display-ready line resolved server-side so the kitchen ticket is readable.
@@ -54,6 +55,7 @@ export type Order = {
   name: string;
   items: OrderItem[];
   note: string;
+  splitForTwo: boolean;
   status: OrderStatus;
   createdAt: number;
   updatedAt: number;

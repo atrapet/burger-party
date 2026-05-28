@@ -10,6 +10,10 @@ const configPath = process.env.CONFIG_PATH ?? join(here, '..', 'config.json');
 
 export const config = JSON.parse(readFileSync(configPath, 'utf8'));
 
+// Mutable in-memory friends list; updated by the kitchen at runtime.
+export let friends = [...config.friends];
+export const setFriends = (list) => { friends = list; };
+
 // Index categories and their options once so order validation/label resolution is O(1).
 export const categoryById = new Map(config.categories.map((category) => [category.id, category]));
 

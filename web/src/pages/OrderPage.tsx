@@ -3,6 +3,7 @@ import type { FC } from 'react';
 import type { CreateOrderPayload, Order, QuantityMap, SelectionMap } from '@/types';
 import { useMenu } from '@/hooks/useMenu';
 import { useStock } from '@/hooks/useStock';
+import { useFriends } from '@/hooks/useFriends';
 import { submitOrder } from '@/lib/socket';
 import { ConnectionBanner } from '@/ui/ConnectionBanner';
 import { BurgerBuilder } from '@/components/BurgerBuilder/BurgerBuilder';
@@ -30,6 +31,7 @@ const loadLastOrder = (): SavedOrder | null => {
 export const OrderPage: FC = () => {
   const { menu, error: menuError } = useMenu();
   const disabledStock = useStock();
+  const friends = useFriends(menu?.friends ?? []);
   const [order, setOrder] = useState<Order | null>(null);
   const [lastOrder, setLastOrder] = useState<SavedOrder | null>(null);
   const [submitting, setSubmitting] = useState(false);
@@ -90,7 +92,7 @@ export const OrderPage: FC = () => {
           <OrderStatusView order={order} onReset={handleReset} />
         ) : (
           <BurgerBuilder
-            menu={menu}
+            menu={{ ...menu, friends }}
             submitting={submitting}
             error={error}
             disabledStock={disabledStock}

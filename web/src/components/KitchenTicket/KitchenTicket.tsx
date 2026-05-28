@@ -30,6 +30,11 @@ export const KitchenTicket: FC<Props> = ({ order, now }) => {
         <span className="text-lg font-extrabold text-stone-800">{order.name}</span>
         <span className="text-xs font-medium text-stone-400">n°{order.number}</span>
       </div>
+      {order.splitForTwo && (
+        <p className="mb-2 inline-flex items-center gap-1 rounded-full bg-orange-100 px-3 py-1 text-xs font-bold text-orange-700">
+          ✂️ Coupé en 2 assiettes
+        </p>
+      )}
       <OrderItems items={order.items} />
       {order.note && <p className="mt-2 text-sm italic text-stone-600">« {order.note} »</p>}
 

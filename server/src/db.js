@@ -14,16 +14,22 @@ db.exec('PRAGMA journal_mode = WAL;');
 
 db.exec(`
   CREATE TABLE IF NOT EXISTS orders (
-    seq        INTEGER PRIMARY KEY AUTOINCREMENT,
-    id         TEXT NOT NULL UNIQUE,
-    name       TEXT NOT NULL,
-    items      TEXT NOT NULL,
-    note       TEXT,
-    status     TEXT NOT NULL DEFAULT 'new',
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
+    seq           INTEGER PRIMARY KEY AUTOINCREMENT,
+    id            TEXT NOT NULL UNIQUE,
+    name          TEXT NOT NULL,
+    items         TEXT NOT NULL,
+    note          TEXT,
+    split_for_two INTEGER NOT NULL DEFAULT 0,
+    status        TEXT NOT NULL DEFAULT 'new',
+    created_at    INTEGER NOT NULL,
+    updated_at    INTEGER NOT NULL
   );
 `);
+
+// Safe migration for existing databases that predate the split_for_two column.
+try {
+  db.exec('ALTER TABLE orders ADD COLUMN split_for_two INTEGER NOT NULL DEFAULT 0');
+} catch { /* column already exists */ }
 
 const rowToOrder = (row) => ({
   id: row.id,
@@ -31,14 +37,15 @@ const rowToOrder = (row) => ({
   name: row.name,
   items: JSON.parse(row.items),
   note: row.note ?? '',
+  splitForTwo: row.split_for_two === 1,
   status: row.status,
   createdAt: row.created_at,
   updatedAt: row.updated_at,
 });
 
 const insertStmt = db.prepare(
-  `INSERT INTO orders (id, name, items, note, status, created_at, updated_at)
-   VALUES (@id, @name, @items, @note, @status, @createdAt, @updatedAt)`,
+  `INSERT INTO orders (id, name, items, note, split_for_two, status, created_at, updated_at)
+   VALUES (@id, @name, @items, @note, @splitForTwo, @status, @createdAt, @updatedAt)`,
 );
 const getStmt = db.prepare('SELECT * FROM orders WHERE id = ?');
 const updateStatusStmt = db.prepare(
@@ -49,8 +56,8 @@ const listActiveStmt = db.prepare(
   "SELECT * FROM orders WHERE status NOT IN ('served', 'cancelled') ORDER BY seq ASC",
 );
 
-export const insertOrder = ({ id, name, items, note, status, createdAt, updatedAt }) => {
-  insertStmt.run({ id, name, items: JSON.stringify(items), note, status, createdAt, updatedAt });
+export const insertOrder = ({ id, name, items, note, splitForTwo, status, createdAt, updatedAt }) => {
+  insertStmt.run({ id, name, items: JSON.stringify(items), note, splitForTwo: splitForTwo ? 1 : 0, status, createdAt, updatedAt });
   return rowToOrder(getStmt.get(id));
 };
 

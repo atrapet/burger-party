@@ -6,8 +6,10 @@ import { useConnection } from '@/hooks/useConnection';
 import { useNow } from '@/hooks/useNow';
 import { useMenu } from '@/hooks/useMenu';
 import { useStock } from '@/hooks/useStock';
+import { useFriends } from '@/hooks/useFriends';
 import { toggleStock } from '@/lib/socket';
 import { KitchenColumn } from '@/components/KitchenColumn/KitchenColumn';
+import { FriendsEditor } from '@/components/FriendsEditor/FriendsEditor';
 
 const COLUMNS: OrderStatus[] = ['new', 'cooking', 'ready'];
 
@@ -19,7 +21,9 @@ export const KitchenPage: FC = () => {
   const now = useNow();
   const { menu } = useMenu();
   const disabledStock = useStock();
+  const friends = useFriends(menu?.friends ?? []);
   const [showStock, setShowStock] = useState(false);
+  const [showFriends, setShowFriends] = useState(false);
 
   return (
     <div className="flex h-screen flex-col bg-stone-200">
@@ -28,7 +32,16 @@ export const KitchenPage: FC = () => {
         <div className="flex items-center gap-4">
           <button
             type="button"
-            onClick={() => setShowStock((v) => !v)}
+            onClick={() => { setShowFriends((v) => !v); setShowStock(false); }}
+            className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
+              showFriends ? 'bg-orange-600 text-white' : 'bg-white text-stone-700 hover:bg-stone-100'
+            }`}
+          >
+            👥 Invités
+          </button>
+          <button
+            type="button"
+            onClick={() => { setShowStock((v) => !v); setShowFriends(false); }}
             className={`rounded-lg px-3 py-1.5 text-sm font-semibold transition-colors ${
               showStock ? 'bg-orange-600 text-white' : 'bg-white text-stone-700 hover:bg-stone-100'
             }`}
@@ -58,6 +71,10 @@ export const KitchenPage: FC = () => {
             />
           ))}
         </div>
+
+        {showFriends && (
+          <FriendsEditor friends={friends} onClose={() => setShowFriends(false)} />
+        )}
 
         {showStock && menu && (
           <aside className="w-64 shrink-0 overflow-y-auto rounded-xl bg-white shadow-lg">

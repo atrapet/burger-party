@@ -47,7 +47,7 @@ const buildItems = (selections, quantities = {}) => {
   return { items };
 };
 
-export const createOrder = ({ name, selections, note, quantities }) => {
+export const createOrder = ({ name, selections, note, quantities, splitForTwo }) => {
   const trimmedName = typeof name === 'string' ? name.trim() : '';
   if (trimmedName.length === 0) return { error: 'Indique ton prénom' };
 
@@ -60,6 +60,7 @@ export const createOrder = ({ name, selections, note, quantities }) => {
     name: trimmedName,
     items,
     note: typeof note === 'string' ? note.trim().slice(0, 280) : '',
+    splitForTwo: splitForTwo === true,
     status: 'new',
     createdAt: now,
     updatedAt: now,
